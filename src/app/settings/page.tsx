@@ -86,6 +86,18 @@ export default function SettingsPage() {
         <h1 className="text-lg font-semibold">Settings</h1>
         <span />
       </header>
+      <div className="max-w-md mb-6">
+        <Link
+          href="/calculator"
+          className="block rounded-2xl border bg-card p-4 hover:bg-stone-100 transition-colors"
+        >
+          <div className="font-semibold">📐 Calorie calculator</div>
+          <div className="text-sm text-stone-600">
+            Compute targets from your stats + goal, then apply them below.
+          </div>
+        </Link>
+      </div>
+
       <form onSubmit={save} className="space-y-3 max-w-md">
         <p className="text-sm text-stone-600">Daily goals</p>
         {GOAL_FIELDS.map((f) => (

@@ -13,6 +13,14 @@ export const users = pgTable('users', {
   dailySugarGoalG: integer('daily_sugar_goal_g').notNull().default(50),
   dailySodiumGoalMg: integer('daily_sodium_goal_mg').notNull().default(2300),
   dailySatFatGoalG: integer('daily_sat_fat_goal_g').notNull().default(20),
+  heightCm: integer('height_cm'),
+  weightKg: real('weight_kg'),
+  bodyFatPct: real('body_fat_pct'),
+  age: integer('age'),
+  sex: text('sex'),
+  activityLevel: text('activity_level'),
+  goal: text('goal'),
+  goalPace: text('goal_pace'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
