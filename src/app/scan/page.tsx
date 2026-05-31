@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { ConfirmCard } from '@/components/confirm-card';
 
 type AnalyzeResult = {
-  name: string; calories: number; proteinG: number; carbsG: number; fatG: number;
+  name: string;
+  calories: number; proteinG: number; carbsG: number; fatG: number;
+  fiberG: number; sugarG: number; sodiumMg: number; satFatG: number;
   confidence: number; notes?: string;
 };
 

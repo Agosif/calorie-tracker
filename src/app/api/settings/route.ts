@@ -16,6 +16,10 @@ const patchSchema = z.object({
   dailyProteinGoalG: z.number().int().nonnegative(),
   dailyCarbGoalG: z.number().int().nonnegative(),
   dailyFatGoalG: z.number().int().nonnegative(),
+  dailyFiberGoalG: z.number().int().nonnegative(),
+  dailySugarGoalG: z.number().int().nonnegative(),
+  dailySodiumGoalMg: z.number().int().nonnegative(),
+  dailySatFatGoalG: z.number().int().nonnegative(),
 });
 
 export async function PATCH(req: NextRequest) {

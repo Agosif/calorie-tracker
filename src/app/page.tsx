@@ -1,13 +1,11 @@
-import Link from 'next/link';
 import { and, eq, gte, lt, desc } from 'drizzle-orm';
+import Link from 'next/link';
+import { Activity } from 'lucide-react';
 import { db } from '@/lib/db';
 import { users, meals } from '@/lib/schema';
 import { requireUserId } from '@/lib/session';
 import { dayBoundsUtc, todayKey } from '@/lib/date';
-import { CalorieRing } from '@/components/calorie-ring';
-import { MacroBars } from '@/components/macro-bars';
-import { MealCard } from '@/components/meal-card';
-import { buttonVariants } from '@/components/ui/button';
+import { CalorieTrackerCard } from '@/components/ui/tracker-card';
 
 export default async function TodayPage() {
   const userId = await requireUserId();
@@ -26,50 +24,47 @@ export default async function TodayPage() {
       p: a.p + m.proteinG,
       c: a.c + m.carbsG,
       f: a.f + m.fatG,
+      fiber: a.fiber + m.fiberG,
+      sugar: a.sugar + m.sugarG,
+      sodium: a.sodium + m.sodiumMg,
+      satFat: a.satFat + m.satFatG,
     }),
-    { cal: 0, p: 0, c: 0, f: 0 },
+    { cal: 0, p: 0, c: 0, f: 0, fiber: 0, sugar: 0, sodium: 0, satFat: 0 },
   );
 
-  const remaining = Math.max(0, user.dailyCalorieGoal - totals.cal);
-
   return (
-    <main className="min-h-screen pb-32 bg-stone-50">
-      <header className="flex justify-between items-center p-4">
+    <main className="min-h-screen bg-stone-50 dark:bg-stone-950 pb-12">
+      <header className="flex justify-between items-center p-4 max-w-sm mx-auto">
         <h1 className="text-lg font-semibold">Today</h1>
         <div className="flex gap-4">
-          <Link href="/history" className="text-sm text-stone-600">History</Link>
-          <Link href="/settings" className="text-sm text-stone-600">Settings</Link>
+          <Link href="/history" className="text-sm text-stone-600 dark:text-stone-400">History</Link>
+          <Link href="/settings" className="text-sm text-stone-600 dark:text-stone-400">Settings</Link>
         </div>
       </header>
 
-      <div className="py-6">
-        <CalorieRing remaining={remaining} goal={user.dailyCalorieGoal} />
-      </div>
-
-      <MacroBars
-        macros={[
-          { label: 'Protein', have: totals.p, goal: user.dailyProteinGoalG, color: '#5C8C5A' },
-          { label: 'Carbs',   have: totals.c, goal: user.dailyCarbGoalG,    color: '#FF6B35' },
-          { label: 'Fat',     have: totals.f, goal: user.dailyFatGoalG,     color: '#A78BFA' },
-        ]}
-      />
-
-      <section className="mt-6 px-4 space-y-2">
-        {rows.length === 0 ? (
-          <p className="text-stone-500 text-center py-6">No meals logged yet today.</p>
-        ) : (
-          rows.map((m) => <MealCard key={m.id} meal={m} />)
-        )}
-      </section>
-
-      <div className="fixed bottom-6 inset-x-0 flex justify-center items-center gap-3 px-6">
-        <Link href="/log" className={buttonVariants({ variant: 'outline' })}>+ Manual</Link>
-        <Link
-          href="/scan"
-          className={buttonVariants({ size: 'lg', className: 'h-16 w-16 rounded-full text-3xl' })}
-        >
-          📷
-        </Link>
+      <div className="px-4 flex justify-center">
+        <CalorieTrackerCard
+          icon={<Activity className="h-6 w-6" />}
+          title="Daily intake"
+          subtitle={new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+          currentCalories={totals.cal}
+          goalCalories={user.dailyCalorieGoal}
+          nutrients={[
+            { label: 'Protein', current: totals.p,      goal: user.dailyProteinGoalG,   unit: 'g' },
+            { label: 'Carbs',   current: totals.c,      goal: user.dailyCarbGoalG,      unit: 'g' },
+            { label: 'Fat',     current: totals.f,      goal: user.dailyFatGoalG,       unit: 'g' },
+            { label: 'Fiber',   current: totals.fiber,  goal: user.dailyFiberGoalG,     unit: 'g' },
+            { label: 'Sugar',   current: totals.sugar,  goal: user.dailySugarGoalG,     unit: 'g' },
+            { label: 'Sat fat', current: totals.satFat, goal: user.dailySatFatGoalG,    unit: 'g' },
+            { label: 'Sodium',  current: totals.sodium, goal: user.dailySodiumGoalMg,   unit: 'mg' },
+          ]}
+          todaysMeals={rows.map((m) => ({
+            id: m.id,
+            name: m.name,
+            calories: m.calories,
+            mealType: m.mealType,
+          }))}
+        />
       </div>
     </main>
   );

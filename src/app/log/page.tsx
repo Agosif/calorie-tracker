@@ -8,15 +8,32 @@ import { Label } from '@/components/ui/label';
 
 const TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 
+type NumField = 'calories' | 'proteinG' | 'carbsG' | 'fatG' | 'fiberG' | 'sugarG' | 'sodiumMg' | 'satFatG';
+
+const FIELDS: { key: NumField; label: string; unit: string }[] = [
+  { key: 'calories',  label: 'Calories', unit: 'kcal' },
+  { key: 'proteinG',  label: 'Protein',  unit: 'g' },
+  { key: 'carbsG',    label: 'Carbs',    unit: 'g' },
+  { key: 'fatG',      label: 'Fat',      unit: 'g' },
+  { key: 'fiberG',    label: 'Fiber',    unit: 'g' },
+  { key: 'sugarG',    label: 'Sugar',    unit: 'g' },
+  { key: 'sodiumMg',  label: 'Sodium',   unit: 'mg' },
+  { key: 'satFatG',   label: 'Sat fat',  unit: 'g' },
+];
+
 export default function LogPage() {
   const router = useRouter();
   const [name, setName] = useState('');
-  const [calories, setCalories] = useState('');
-  const [protein, setProtein] = useState('');
-  const [carbs, setCarbs] = useState('');
-  const [fat, setFat] = useState('');
+  const [values, setValues] = useState<Record<NumField, string>>({
+    calories: '', proteinG: '', carbsG: '', fatG: '',
+    fiberG: '', sugarG: '', sodiumMg: '', satFatG: '',
+  });
   const [mealType, setMealType] = useState<typeof TYPES[number]>('snack');
   const [saving, setSaving] = useState(false);
+
+  function set(key: NumField, v: string) {
+    setValues((prev) => ({ ...prev, [key]: v }));
+  }
 
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
@@ -27,10 +44,14 @@ export default function LogPage() {
       body: JSON.stringify({
         mealType,
         name,
-        calories: Number(calories) || 0,
-        proteinG: Number(protein) || 0,
-        carbsG: Number(carbs) || 0,
-        fatG: Number(fat) || 0,
+        calories: Number(values.calories) || 0,
+        proteinG: Number(values.proteinG) || 0,
+        carbsG: Number(values.carbsG) || 0,
+        fatG: Number(values.fatG) || 0,
+        fiberG: Number(values.fiberG) || 0,
+        sugarG: Number(values.sugarG) || 0,
+        sodiumMg: Number(values.sodiumMg) || 0,
+        satFatG: Number(values.satFatG) || 0,
         source: 'manual',
       }),
     });
@@ -47,22 +68,20 @@ export default function LogPage() {
           <Input value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label>Calories</Label>
-            <Input type="number" inputMode="numeric" value={calories} onChange={(e) => setCalories(e.target.value)} required />
-          </div>
-          <div>
-            <Label>Protein (g)</Label>
-            <Input type="number" inputMode="numeric" value={protein} onChange={(e) => setProtein(e.target.value)} />
-          </div>
-          <div>
-            <Label>Carbs (g)</Label>
-            <Input type="number" inputMode="numeric" value={carbs} onChange={(e) => setCarbs(e.target.value)} />
-          </div>
-          <div>
-            <Label>Fat (g)</Label>
-            <Input type="number" inputMode="numeric" value={fat} onChange={(e) => setFat(e.target.value)} />
-          </div>
+          {FIELDS.map((f) => (
+            <div key={f.key}>
+              <Label className="text-xs">
+                {f.label} ({f.unit})
+              </Label>
+              <Input
+                type="number"
+                inputMode="numeric"
+                value={values[f.key]}
+                onChange={(e) => set(f.key, e.target.value)}
+                required={f.key === 'calories'}
+              />
+            </div>
+          ))}
         </div>
         <div>
           <Label>Meal</Label>
